@@ -10,6 +10,7 @@ shelf/
 workspace.xml
 
 .classpath
+.factorypath
 .project
 .settings/
 bin/
