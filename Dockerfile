@@ -31,4 +31,4 @@ ENV JAVA_HOME=/opt/jre
 ENV PATH="$PATH:$JAVA_HOME/bin"
 
 COPY --from=maven-build /opt/app/target/jsbm-0.0.1-SNAPSHOT.jar /opt/app.jar
-ENTRYPOINT ["java","-jar","/opt/app.jar"]
+ENTRYPOINT ["java", "-XX:+UseParallelGC", "-XX:MaxRAMPercentage=75", "-jar","/opt/app.jar"]
