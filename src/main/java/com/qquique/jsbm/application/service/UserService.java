@@ -15,9 +15,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    @Autowired
     private UserRepository userRepository;
     private static final Logger logger = LogManager.getLogger(UserService.class);
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public UserDTO saveUser(UserDTO userDTO) {
         try {
