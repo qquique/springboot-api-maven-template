@@ -1,10 +1,14 @@
 package com.qquique.jsbm.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
 @MappedSuperclass
+@Getter
+@Setter
 public abstract class Base {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_date_created")
@@ -13,22 +17,6 @@ public abstract class Base {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_date_modified")
     private Date lastDateModified;
-
-    public Date getLastDateCreated() {
-        return lastDateCreated;
-    }
-
-    public void setLastDateCreated(Date lastDateCreated) {
-        this.lastDateCreated = lastDateCreated;
-    }
-
-    public Date getLastDateModified() {
-        return lastDateModified;
-    }
-
-    public void setLastDateModified(Date lastDateModified) {
-        this.lastDateModified = lastDateModified;
-    }
 
     @PrePersist
     public void prePersist() {
