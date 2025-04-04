@@ -1,21 +1,26 @@
 package com.qquique.jsbm.application.api.controller;
 
-import com.qquique.jsbm.application.dto.UserDTO;
-import com.qquique.jsbm.application.service.UserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.qquique.jsbm.application.dto.UserDTO;
+import com.qquique.jsbm.application.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
     private UserService userService;
-    private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
     public UserController(UserService userService) {
@@ -24,69 +29,38 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        try {
-            UserDTO userDTO = userService.findById(id);
-            if (userDTO != null) {
-                return new ResponseEntity<>(userDTO, HttpStatus.OK);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error getting user: " + e.getMessage());
-        }
+        UserDTO userDTO = userService.findById(id);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
-        try {
-            List<UserDTO> users = userService.findAllUsers();
-            if (!users.isEmpty()) {
-                return new ResponseEntity<>(users, HttpStatus.OK);
-            } else {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No users found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error getting users: " + e.getMessage());
-        }
+        List<UserDTO> users = userService.findAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
-        try {
-            UserDTO createdUser = userService.saveUser(userDTO);
-            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving user: " + e.getMessage());
-        }
+        UserDTO createdUser = userService.saveUser(userDTO);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable("id") Long id) {
-        try {
-            if (userService.deleteById(id)) {
-                return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error deleting user", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (userService.deleteById(id)) {
+            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping("/users/{id}")
     public ResponseEntity<?> updateUserById(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            UserDTO updatedUser = userService.updateUser(id, userDTO);
-            if (updatedUser != null) {
-                return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating user: " + e.getMessage());
+        UserDTO updatedUser = userService.updateUser(id, userDTO);
+        if (updatedUser != null) {
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 }

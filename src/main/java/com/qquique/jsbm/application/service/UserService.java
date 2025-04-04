@@ -1,17 +1,20 @@
 package com.qquique.jsbm.application.service;
 
-import com.qquique.jsbm.application.dto.UserDTO;
-import com.qquique.jsbm.application.mapper.UserMapper;
-import com.qquique.jsbm.domain.entity.User;
-import com.qquique.jsbm.infrastructure.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.qquique.jsbm.application.dto.UserDTO;
+import com.qquique.jsbm.application.mapper.UserMapper;
+import com.qquique.jsbm.domain.entity.User;
+import com.qquique.jsbm.infrastructure.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -24,33 +27,20 @@ public class UserService {
     }
 
     public UserDTO saveUser(UserDTO userDTO) {
-        try {
-            User user = UserMapper.INSTANCE.mapToDomain(userDTO);
-            return UserMapper.INSTANCE.mapToDTO(userRepository.save(user));
-        } catch (Exception e) {
-            logger.error("error creating user");
-            throw e;
-        }
+        User user = UserMapper.INSTANCE.mapToDomain(userDTO);
+        return UserMapper.INSTANCE.mapToDTO(userRepository.save(user));
     }
 
     public List<UserDTO> findAllUsers() {
-        try {
-            List<User> users = userRepository.findAll();
-            return users.stream()
-                    .map(UserMapper.INSTANCE::mapToDTO)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve users", e);
-        }
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(UserMapper.INSTANCE::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     public UserDTO findById(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            return UserMapper.INSTANCE.mapToDTO(optionalUser.get());
-        } else {
-            throw new RuntimeException("User not found with id: " + id);
-        }
+        return UserMapper.INSTANCE.mapToDTO(optionalUser.get());
     }
 
     public boolean deleteById(Long id) {
@@ -59,7 +49,7 @@ public class UserService {
             userRepository.delete(optionalUser.get());
             return true;
         } else {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new EntityNotFoundException("user id not found");
         }
     }
 
@@ -72,7 +62,7 @@ public class UserService {
             return UserMapper.INSTANCE.mapToDTO(updateUser);
         } else {
             logger.error("error updating user");
-            throw new RuntimeException("error updating error");
+            throw new RuntimeException("error updating user");
         }
     }
 }
