@@ -35,7 +35,7 @@ public class UserService {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(UserMapper.INSTANCE::mapToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public UserDTO findById(Long id) {
