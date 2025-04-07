@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.qquique.jsbm.application.dto.UserDTO;
 import com.qquique.jsbm.application.service.UserService;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
@@ -28,39 +30,36 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        UserDTO userDTO = userService.findById(id);
-        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.findAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.saveUser(userDTO);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(userDTO));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
         if (userService.deleteById(id)) {
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+            return ResponseEntity.ok("User deleted successfully");
         } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> updateUserById(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO updatedUser = userService.updateUser(id, userDTO);
-        if (updatedUser != null) {
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        if (updatedUser == null) {
+            throw new EntityNotFoundException("User not found with id: " + id);
         }
+        return ResponseEntity.ok(updatedUser);
     }
 }
