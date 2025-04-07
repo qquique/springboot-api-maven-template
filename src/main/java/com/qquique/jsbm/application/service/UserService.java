@@ -39,8 +39,9 @@ public class UserService {
     }
 
     public UserDTO findById(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        return UserMapper.INSTANCE.mapToDTO(optionalUser.get());
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        return UserMapper.INSTANCE.mapToDTO(user);
     }
 
     public boolean deleteById(Long id) {
