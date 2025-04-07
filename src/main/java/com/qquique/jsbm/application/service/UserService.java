@@ -55,15 +55,10 @@ public class UserService {
     }
 
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User updateUser = optionalUser.get();
-            UserMapper.INSTANCE.updateUserFromDTO(userDTO, updateUser);
-            updateUser = userRepository.save(updateUser);
-            return UserMapper.INSTANCE.mapToDTO(updateUser);
-        } else {
-            logger.error("error updating user");
-            throw new RuntimeException("error updating user");
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        UserMapper.INSTANCE.updateUserFromDTO(userDTO, user);
+        user = userRepository.save(user);
+        return UserMapper.INSTANCE.mapToDTO(user);
     }
 }
